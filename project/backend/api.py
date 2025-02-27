@@ -1,10 +1,12 @@
-from fastapi import FastAPI, File, UploadFile, Depends, HTTPException
+from fastapi import FastAPI, File, UploadFile, Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 import os
 import uuid
 from database import DataBase  # Импортируем ваш класс DataBase
 from models import MediaFileDB  # Импортируем модель MediaFileDB
 from iniparser import Config
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
@@ -29,6 +31,12 @@ def get_db():
 MEDIA_DIR = config.getValue('fileserver', 'media')
 os.makedirs(MEDIA_DIR, exist_ok=True)
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/")
+async def upload_form(request: Request):
+    return templates.TemplateResponse("upload_form.html", {"request": request})
 
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...), db=Depends(get_db)):
