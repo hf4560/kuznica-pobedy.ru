@@ -8,6 +8,6 @@ class Config(configparser.ConfigParser):
 
     def getValue(self, section: str, key: str):
         try:
-            return quote_plus(self[section][key])
+            return self[section][key]
         except Exception as e:
             raise e

@@ -4,11 +4,14 @@ import os
 import uuid
 from database import DataBase  # Импортируем ваш класс DataBase
 from models import MediaFileDB  # Импортируем модель MediaFileDB
+from iniparser import Config
 
 app = FastAPI()
 
+config = Config('config.ini')
+
 # Инициализация базы данных
-db_instance = DataBase(database="your_database_name")
+db_instance = DataBase(database="media")
 db_instance.connect()
 db_instance.create_tables()
 
@@ -23,7 +26,7 @@ def get_db():
 
 
 # Директория для хранения медиафайлов
-MEDIA_DIR = "media"
+MEDIA_DIR = config.getValue('fileserver', 'media')
 os.makedirs(MEDIA_DIR, exist_ok=True)
 
 
@@ -64,3 +67,8 @@ async def get_file(file_uuid: str, db=Depends(get_db)):
 
     # Отдаем файл
     return FileResponse(db_file.file_path)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="localhost", port=8000)
