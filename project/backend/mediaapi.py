@@ -11,7 +11,7 @@ app = FastAPI()
 config = Config('config.ini')
 
 # Инициализация базы данных
-db_instance = DataBase(database="media")
+db_instance = DataBase()
 db_instance.connect()
 db_instance.create_tables()
 
