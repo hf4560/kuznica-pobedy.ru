@@ -36,3 +36,14 @@
 +defaults/win-64::starlette-0.38.2-py312haa95532_0
 +defaults/win-64::typing-extensions-4.12.2-py312haa95532_0
 # update specs: ['fastapi']
+==> 2025-02-27 16:06:32 <==
+# cmd: C:\ProgramData\anaconda3\Scripts\conda-script.py install -p D:/WebServers/home/kuznica-pobedy.ru/env/kuznica-pobedy.ru requests -y
+# conda version: 24.11.3
++defaults/noarch::charset-normalizer-3.3.2-pyhd3eb1b0_0
++defaults/win-64::brotli-python-1.0.9-py312h5da7b33_9
++defaults/win-64::certifi-2025.1.31-py312haa95532_0
++defaults/win-64::pysocks-1.7.1-py312haa95532_0
++defaults/win-64::requests-2.32.3-py312haa95532_1
++defaults/win-64::urllib3-2.3.0-py312haa95532_0
++defaults/win-64::win_inet_pton-1.1.0-py312haa95532_0
+# update specs: ['requests']
