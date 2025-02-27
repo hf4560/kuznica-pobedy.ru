@@ -1,6 +1,8 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker
+from datetime import datetime
 from iniparser import Config
+
 
 # Чтение конфигурации из файла
 config = Config('config.ini')
@@ -32,3 +34,13 @@ class DataBase:
     def get_session(self):
         """Получение новой сессии для работы с базой данных."""
         return self.__sessionLocal()
+
+
+class MediaFileDB:
+    __tablename__ = "media_files"
+
+    id = Column(Integer, primary_key=True, index=True)
+    file_uuid = Column(String, unique=True, nullable=False)  # Уникальный идентификатор файла
+    original_name = Column(String, nullable=False)           # Оригинальное имя файла
+    file_path = Column(String, nullable=False)               # Путь к файлу на сервере
+    uploaded_at = Column(DateTime, default=datetime.utcnow)  # Время загрузки
