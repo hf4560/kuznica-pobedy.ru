@@ -71,4 +71,4 @@ async def get_file(file_uuid: str, db=Depends(get_db)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host=config.getValue('mediaapi', 'host'), port=int(config.getValue('mediaapi', 'port')))
