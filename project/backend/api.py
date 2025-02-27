@@ -3,10 +3,12 @@ from fastapi.responses import FileResponse
 import os
 import uuid
 from database import DataBase  # Импортируем ваш класс DataBase
-from models import MediaFileDB  # Импортируем модель MediaFileDB
+from models import MediaFileDB, StaticContent  # Импортируем модель MediaFileDB
 from iniparser import Config
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+from typing import Dict
 
 app = FastAPI()
 
@@ -33,6 +35,10 @@ os.makedirs(MEDIA_DIR, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
+# Pydantic модель для валидации
+class ContentData(BaseModel):
+    content: Dict
 
 @app.get("/")
 async def upload_form(request: Request):
@@ -76,6 +82,44 @@ async def get_file(file_uuid: str, db=Depends(get_db)):
     # Отдаем файл
     return FileResponse(db_file.file_path)
 
+
+# Получение статического контента
+@app.get("/api/static/{component_type}", response_model=Dict)
+async def get_static_content(
+        component_type: str,
+        db=Depends(get_db)
+):
+    component = db.query(StaticContent).filter(
+        StaticContent.component_type == component_type
+    ).first()
+    if not component:
+        raise HTTPException(status_code=404, detail="Component not found")
+    return component.content
+
+
+# Обновление статического контента (только для админов)
+@app.put("/api/static/{component_type}", status_code=204)
+async def update_static_content(
+        component_type: str,
+        data: ContentData,
+        db=Depends(get_db),
+        # Добавьте проверку прав админа
+        # user=Depends(get_admin)
+):
+    component = db.query(StaticContent).filter(
+        StaticContent.component_type == component_type
+    ).first()
+
+    if component:
+        component.content = data.content
+    else:
+        component = StaticContent(
+            component_type=component_type,
+            content=data.content
+        )
+        db.add(component)
+
+    db.commit()
 
 if __name__ == "__main__":
     import uvicorn

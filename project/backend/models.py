@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, text
+from sqlalchemy import Column, Integer, String, DateTime, text, JSON, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
@@ -16,3 +17,13 @@ class MediaFileDB(Base):
         DateTime(timezone=True),  # Добавляем временную зону
         server_default=text("NOW()")  # Используем NOW() для PostgreSQL
     )
+
+class StaticContent(Base):
+    __tablename__ = 'components'
+    __table_args__ = {'schema': 'static_content'}  # Указываем схему
+
+    id = Column(Integer, primary_key=True)
+    component_type = Column(String(50), unique=True, nullable=False)
+    content = Column(JSON, nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
