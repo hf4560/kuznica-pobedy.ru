@@ -47,3 +47,12 @@
 +defaults/win-64::urllib3-2.3.0-py312haa95532_0
 +defaults/win-64::win_inet_pton-1.1.0-py312haa95532_0
 # update specs: ['requests']
+==> 2025-02-27 18:05:49 <==
+# cmd: C:\ProgramData\anaconda3\Scripts\conda-script.py install -p D:/WebServers/home/kuznica-pobedy.ru/env/kuznica-pobedy.ru alembic -y
+# conda version: 24.11.3
++defaults/win-64::alembic-1.13.3-py312haa95532_0
++defaults/win-64::greenlet-3.1.1-py312h5da7b33_0
++defaults/win-64::mako-1.2.3-py312haa95532_0
++defaults/win-64::markupsafe-3.0.2-py312h827c3e9_0
++defaults/win-64::sqlalchemy-2.0.37-py312h54f65d0_0
+# update specs: ['alembic']

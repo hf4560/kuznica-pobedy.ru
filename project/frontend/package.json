@@ -10,8 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@arcgis/core": "^4.32.1",
+    "@mapbox/tilebelt": "^2.0.2",
     "axios": "^1.7.9",
+    "deck.gl": "^9.1.4",
     "framer-motion": "^12.4.7",
+    "gsap": "^3.12.7",
     "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
