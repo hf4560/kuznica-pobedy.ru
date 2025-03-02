@@ -27,3 +27,12 @@ class StaticContent(Base):
     content = Column(JSON, nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+class HeaderLink(Base):
+    __tablename__ = 'header_links'
+    __table_args__ = {'schema': 'static_content'}  # Указываем схему
+
+    id = Column(Integer, primary_key=True, index=True)
+    link_to = Column(String, nullable=False)
+    class_name = Column(String, nullable=False)
+    text = Column(String, nullable=False)

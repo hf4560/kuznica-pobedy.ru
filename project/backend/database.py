@@ -1,10 +1,22 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from urllib.parse import quote_plus
-from iniparser import Config
-from models import MediaFileDB  # Добавляем импорт модели
+from project.backend.iniparser import Config
+from project.backend.models import MediaFileDB  # Добавляем импорт модели
 
-config = Config('config.ini')
+
+try:
+    config = Config('project/backend/config.ini')
+    DATABASE_URL = f"{config.getValue('database', 'protocol')}://"\
+                   f"{config.getValue('database', 'user')}:"\
+                   f"{quote_plus(config.getValue('database', 'password'))}@"\
+                   f"{config.getValue('database', 'host')}:"\
+                   f"{config.getValue('database', 'port')}/"\
+                   f"{config.getValue('database', 'database')}"
+    engine = create_engine(DATABASE_URL, echo=True)
+except KeyError:
+    config = Config('config.ini')
+
 
 class DataBase:
     def __init__(self):

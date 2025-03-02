@@ -3,14 +3,24 @@ from fastapi.responses import FileResponse
 import os
 import uuid
 from database import DataBase  # Импортируем ваш класс DataBase
-from models import MediaFileDB, StaticContent  # Импортируем модель MediaFileDB
+from models import MediaFileDB, StaticContent, HeaderLink  # Импортируем модель MediaFileDB
 from iniparser import Config
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from typing import Dict
+from redis_client import redis_client
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # или укажите конкретные домены, например ["http://localhost:3000"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 config = Config('config.ini')
 
@@ -39,6 +49,27 @@ templates = Jinja2Templates(directory="templates")
 # Pydantic модель для валидации
 class ContentData(BaseModel):
     content: Dict
+
+class LinkResponse(BaseModel):
+    link_to: str
+    class_name: str
+    text: str
+
+
+@app.get("/cache/{key}")
+async def get_cache(key: str):
+    # Попытка получить данные из Redis
+    cached_data = redis_client.get(key)
+    if cached_data:
+        return {"key": key, "value": cached_data}
+    else:
+        raise HTTPException(status_code=404, detail="Cache not found")
+
+@app.post("/cache/{key}")
+async def set_cache(key: str, value: str):
+    # Сохраняем данные в Redis с временем жизни 60 секунд
+    redis_client.setex(key, 60, value)
+    return {"key": key, "value": value}
 
 @app.get("/")
 async def upload_form(request: Request):
@@ -120,6 +151,25 @@ async def update_static_content(
         db.add(component)
 
     db.commit()
+
+
+@app.get("/api/headerlinks", response_model=list[LinkResponse])
+async def get_links(db=Depends(get_db)):
+    links = db.query(HeaderLink).all()
+    return links
+
+@app.post("/api/headerlinks")
+async def create_link(link: LinkResponse, db=Depends(get_db)):
+    db_link = HeaderLink(
+        link_to=link.link_to,
+        class_name=link.class_name,
+        text=link.text
+    )
+    db.add(db_link)
+    db.commit()
+    db.refresh(db_link)
+    return db_link
+
 
 if __name__ == "__main__":
     import uvicorn
