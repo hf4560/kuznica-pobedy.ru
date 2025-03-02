@@ -1,8 +1,8 @@
-"""Initial migration
+"""new migration
 
-Revision ID: 60d2bdd9d0ef
+Revision ID: 937703b2b9b7
 Revises: 
-Create Date: 2025-03-02 04:57:13.364127
+Create Date: 2025-03-02 20:36:19.480600
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '60d2bdd9d0ef'
+revision: str = '937703b2b9b7'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -43,9 +43,10 @@ def upgrade() -> None:
     )
     op.create_table('header_links',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('link_to', sa.String(), nullable=False),
-    sa.Column('class_name', sa.String(), nullable=False),
     sa.Column('text', sa.String(), nullable=False),
+    sa.Column('link_to', sa.String(), nullable=True),
+    sa.Column('parent_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['parent_id'], ['static_content.header_links.id'], ),
     sa.PrimaryKeyConstraint('id'),
     schema='static_content'
     )

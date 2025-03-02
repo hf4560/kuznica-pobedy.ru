@@ -1,5 +1,4 @@
 import configparser
-from urllib.parse import quote_plus
 
 class Config(configparser.ConfigParser):
     def __init__(self, path: str):

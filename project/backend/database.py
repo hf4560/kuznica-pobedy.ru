@@ -2,29 +2,26 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from urllib.parse import quote_plus
 from project.backend.iniparser import Config
-from project.backend.models import MediaFileDB  # Добавляем импорт модели
-
 
 try:
     config = Config('project/backend/config.ini')
-    DATABASE_URL = f"{config.getValue('database', 'protocol')}://"\
-                   f"{config.getValue('database', 'user')}:"\
-                   f"{quote_plus(config.getValue('database', 'password'))}@"\
-                   f"{config.getValue('database', 'host')}:"\
-                   f"{config.getValue('database', 'port')}/"\
-                   f"{config.getValue('database', 'database')}"
+    DATABASE_URL = (f"{config.getValue('database', 'protocol')}://"
+                   f"{config.getValue('database', 'user')}:"
+                   f"{quote_plus(config.getValue('database', 'password'))}@"
+                   f"{config.getValue('database', 'host')}:"
+                   f"{config.getValue('database', 'port')}/" 
+                   f"{config.getValue('database', 'database')}")
     engine = create_engine(DATABASE_URL, echo=True)
 except KeyError:
     config = Config('config.ini')
-
 
 class DataBase:
     def __init__(self):
         self.__SQLALCHEMY_DATABASE_URL = (
             f"{config.getValue('database', 'protocol')}://"
-            f"{config.getValue('database', 'user')}:"
+            f"{config.getValue('database', 'user')}:" 
             f"{quote_plus(config.getValue('database', 'password'))}@"
-            f"{config.getValue('database', 'host')}:"
+            f"{config.getValue('database', 'host')}:" 
             f"{config.getValue('database', 'port')}/"
             f"{config.getValue('database', 'database')}"
         )
@@ -42,10 +39,17 @@ class DataBase:
     def create_tables(self):
         try:
             # Явно указываем метаданные для создания таблиц
-            MediaFileDB.metadata.create_all(bind=self.engine)
+            self.Base.metadata.create_all(bind=self.engine)
             print("Tables created successfully!")
         except Exception as e:
             print(f"Error creating tables: {e}")
 
     def get_session(self):
+        """Метод для получения сессии"""
         return self.SessionLocal()
+
+    def get_db(self):
+        try:
+            yield self.SessionLocal
+        finally:
+            self.SessionLocal().close()

@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, text, JSON, TIMESTAMP
+from sqlalchemy import Column, Integer, String, DateTime, text, JSON, TIMESTAMP, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 Base = declarative_base()
@@ -29,10 +30,15 @@ class StaticContent(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
 class HeaderLink(Base):
-    __tablename__ = 'header_links'
-    __table_args__ = {'schema': 'static_content'}  # Указываем схему
+    __tablename__ = "header_links"
+    __table_args__ = {'schema': 'static_content'}
 
     id = Column(Integer, primary_key=True, index=True)
-    link_to = Column(String, nullable=False)
-    class_name = Column(String, nullable=False)
     text = Column(String, nullable=False)
+    link_to = Column(String, nullable=True)
+    parent_id = Column(Integer, ForeignKey("static_content.header_links.id"), nullable=True)  # Указание схемы
+
+    submenu = relationship("HeaderLink", backref="parent", remote_side=[id])
+
+    def __repr__(self):
+        return f"<HeaderLink(id={self.id}, text={self.text}, link_to={self.link_to}, parent_id={self.parent_id})>"
